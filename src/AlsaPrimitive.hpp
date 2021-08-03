@@ -18,12 +18,21 @@
 #define __ALSA_PRIMITIVE_HPP__
 
 #include "Buffer.hpp"
+#if __linux__
+#include <alsa/asoundlib.h>
+#endif
 
 class AlsaPrimitive
 {
+protected:
+#if __linux__
+  static inline snd_pcm_t* mHandle = nullptr;
+  static inline AudioFormat mLastFormat;
+#endif
 public:
   static void initialize(void);
   static void terminate(void);
+  static bool config(AudioFormat& format);
   static void write(IAudioBuffer& buf);
 };
 

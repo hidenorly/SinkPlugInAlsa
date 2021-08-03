@@ -2,7 +2,7 @@
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
 	CXX=ccache clang++
-	LDLIBS=-ldl
+	LDLIBS=-ldl -lasound
 	CXXFLAGS=-std=c++2a -MMD -MP -Wall -fPIC
 endif
 ifeq ($(UNAME),Darwin)

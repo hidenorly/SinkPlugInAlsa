@@ -15,28 +15,84 @@
 */
 
 #include "AlsaPrimitive.hpp"
-#if __linux__
-#include <alsa/asoundlib.h>
-#endif
+
+#define ALSA_DEVICE_NAME "default"
 
 void AlsaPrimitive::initialize(void)
 {
 #if __linux__
-
+  mHandle = nullptr;
+  if( snd_pcm_open(&mHandle, ALSA_DEVICE_NAME, SND_PCM_STREAM_PLAYBACK, 0) < 0 ){
+    mHandle = nullptr;
+  }
 #endif
 }
 
 void AlsaPrimitive::terminate(void)
 {
 #if __linux__
-
+  if( mHandle ){
+    snd_pcm_drain(mHandle);
+    snd_pcm_close(mHandle);
+    mHandle = nullptr;
+  }
 #endif
-
 }
+
+bool AlsaPrimitive::config(AudioFormat& format)
+{
+#if __linux__
+  if( mHandle ){
+    snd_pcm_format_t alsaFormat = SND_PCM_FORMAT_S16_LE;
+    switch( format.getEncoding() ){
+      case AudioFormat::ENCODING::PCM_8BIT:
+        alsaFormat = SND_PCM_FORMAT_S8;
+        break;
+      case AudioFormat::ENCODING::PCM_16BIT:
+        alsaFormat = SND_PCM_FORMAT_S16_LE;
+        break;
+      case AudioFormat::ENCODING::PCM_24BIT_PACKED:
+        alsaFormat = SND_PCM_FORMAT_S24_LE;
+        break;
+      case AudioFormat::ENCODING::PCM_32BIT:
+        alsaFormat = SND_PCM_FORMAT_S32_LE;
+        break;
+      case AudioFormat::ENCODING::PCM_FLOAT:
+        alsaFormat = SND_PCM_FORMAT_FLOAT_LE;
+        break;
+      default:
+        break;
+    }
+    snd_pcm_set_params(mHandle,
+      alsaFormat,
+      SND_PCM_ACCESS_RW_INTERLEAVED,
+      format.getNumberOfChannels(),
+      format.getSamplingRate(),
+      1,
+      500000
+    );
+  }
+#endif
+  return ( mHandle != nullptr );
+}
+
 
 void AlsaPrimitive::write(IAudioBuffer& buf)
 {
+  AudioBuffer* pBuf = dynamic_cast<AudioBuffer*>(&buf);
+  if( pBuf ){
+    AudioFormat format = pBuf->getAudioFormat();
+    if( !mLastFormat.equal( format ) ){
+      if( config( format ) ){
+        mLastFormat = format;
+      }
+    }
+    ByteBuffer rawBuffer = pBuf->getRawBuffer();
 #if __linux__
-
+    if( mHandle ){
+      snd_pcm_sframes_t frames = snd_pcm_writei( mHandle, rawBuffer.data(), rawBuffer.size() );
+    }
 #endif
+  }
 }
+
