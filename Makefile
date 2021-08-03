@@ -3,13 +3,14 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
 	CXX=ccache clang++
 	LDLIBS=-ldl
+	CXXFLAGS=-std=c++2a -MMD -MP -Wall -fPIC
 endif
 ifeq ($(UNAME),Darwin)
 	CXX=ccache clang++
 	LDLIBS=-stdlib=libc++
+	CXXFLAGS=-std=c++2a -MMD -MP -Wall
 endif
 
-CXXFLAGS=-std=c++2a -MMD -MP -Wall
 LDFLAGS=-pthread
 
 # project config

@@ -16,7 +16,7 @@
 
 #include "AlsaPrimitive.hpp"
 #if __linux__
-#include <asoundlib.h>
+#include <alsa/asoundlib.h>
 #endif
 
 void AlsaPrimitive::initialize(void)
