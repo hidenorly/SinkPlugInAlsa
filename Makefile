@@ -10,7 +10,8 @@ ifeq ($(UNAME),Darwin)
 	CXX=ccache clang++
 	LDLIBS=-stdlib=libc++
 	CXXFLAGS=-std=c++2a -MMD -MP -Wall
-	SHARED_CXXFLAGS= -flat_namespace -dynamiclib
+#	SHARED_CXXFLAGS= -flat_namespace -dynamiclib
+	SHARED_CXXFLAGS=-dynamiclib
 endif
 
 LDFLAGS=-pthread
@@ -24,7 +25,6 @@ LIB_SINK_DIR=$(LIB_DIR)/sink-plugin
 OBJ_DIR=./out
 
 # --- source code config --------------
-INCS = $(wildcard $(INC_DIR)/*.hpp)
 EXO_SRCS = $(wildcard $(EXO_DIR)/*.cpp)
 
 # --- the object files config --------------
@@ -48,7 +48,7 @@ default: $(EXO_SO_TARGET)
 $(EXO_SO_TARGET): $(EXO_OBJS)
 	@[ -d $(LIB_DIR) ] || mkdir -p $(LIB_DIR)
 	@[ -d $(LIB_SINK_DIR) ] || mkdir -p $(LIB_SINK_DIR)
-	$(CXX) $(LDFLAGS) $(EXO_OBJS) $(SHARED_CXXFLAGS) -o $@ $(LDLIBS) $(AFW_SO_TARGET)
+	$(CXX) $(LDFLAGS) $(SHARED_CXXFLAGS) $(EXO_OBJS) -o $@ $(LDLIBS) $(AFW_SO_TARGET)
 
 $(EXO_OBJS): $(EXO_SRCS)
 	@[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
@@ -58,5 +58,4 @@ $(EXO_OBJS): $(EXO_SRCS)
 
 # --- clean up ------------------------
 clean:
-	rm -f $(OBJS) $(EXO_SO_TARGET)
-
+	rm -f $(EXO_OBJS) $(EXO_SO_TARGET)

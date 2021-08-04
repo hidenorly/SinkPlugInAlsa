@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
+#ifndef __SINK_ALSA_HPP__
+#define __SINK_ALSA_HPP__
+
 #include "Sink.hpp"
 #include "Buffer.hpp"
 #include "AudioFormat.hpp"
 #include <vector>
 #include <cmath>
 #include <iostream>
-
-#ifndef __SINK_ALSA_HPP__
-#define __SINK_ALSA_HPP__
 
 class SinkAlsa : public Sink
 {

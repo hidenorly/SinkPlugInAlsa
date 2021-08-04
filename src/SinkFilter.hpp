@@ -14,14 +14,14 @@
    limitations under the License.
 */
 
+#ifndef __SINK_FILTER_HPP__
+#define __SINK_FILTER_HPP__
+
 #include "Buffer.hpp"
 #include "Filter.hpp"
 #include "AudioFormat.hpp"
 #include <vector>
 #include <string>
-
-#ifndef __SINK_FILTER_HPP__
-#define __SINK_FILTER_HPP__
 
 class NullFilter : public Filter
 {
