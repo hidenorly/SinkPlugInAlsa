@@ -4,11 +4,13 @@ ifeq ($(UNAME),Linux)
 	CXX=ccache clang++
 	LDLIBS=-ldl -lasound
 	CXXFLAGS=-std=c++2a -MMD -MP -Wall -fPIC
+	SHARED_CXXFLAGS= -fPIC -shared
 endif
 ifeq ($(UNAME),Darwin)
 	CXX=ccache clang++
 	LDLIBS=-stdlib=libc++
 	CXXFLAGS=-std=c++2a -MMD -MP -Wall
+	SHARED_CXXFLAGS= -flat_namespace -dynamiclib
 endif
 
 LDFLAGS=-pthread
@@ -33,12 +35,10 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
 	EXO_SO_TARGET = $(LIB_SINK_DIR)/libsink_alsa.so
 	AFW_SO_TARGET = $(LIB_DIR)/libafw.so
-	SHARED_CXXFLAGS= -fPIC -shared
 endif
 ifeq ($(UNAME),Darwin)
 	EXO_SO_TARGET = $(LIB_SINK_DIR)/libsink_alsa.dylib
 	AFW_SO_TARGET = $(LIB_DIR)/libafw.dylib
-	SHARED_CXXFLAGS= -flat_namespace -dynamiclib
 endif
 EXO_DEPS = $(EXO_OBJS:.o=.d)
 

@@ -78,6 +78,15 @@ public:
     return result;
   }
 
+  virtual bool isAvailableFormat(AudioFormat format){
+    bool result = false;
+    if( mPipedSink ){
+      result = mPipedSink->isAvailableFormat(format);
+    }
+    return result;
+  };
+
+
   virtual std::shared_ptr<ISink> attachSink(std::shared_ptr<ISink> pSink){
     std::shared_ptr<ISink> result;
     if( mPipedSink ){

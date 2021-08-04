@@ -17,6 +17,7 @@
 #ifndef __ALSA_PRIMITIVE_HPP__
 #define __ALSA_PRIMITIVE_HPP__
 
+#include "AudioFormat.hpp"
 #include "Buffer.hpp"
 #if __linux__
 #include <alsa/asoundlib.h>
@@ -25,9 +26,9 @@
 class AlsaPrimitive
 {
 protected:
+  static inline AudioFormat mLastFormat = AudioFormat(AudioFormat::ENCODING::PCM_UNKNOWN);
 #if __linux__
   static inline snd_pcm_t* mHandle = nullptr;
-  static inline AudioFormat mLastFormat;
 #endif
 public:
   static void initialize(void);

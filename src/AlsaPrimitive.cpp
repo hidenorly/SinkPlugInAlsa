@@ -15,6 +15,7 @@
 */
 
 #include "AlsaPrimitive.hpp"
+#include <iostream>
 
 #define ALSA_DEVICE_NAME "default"
 
@@ -22,7 +23,9 @@ void AlsaPrimitive::initialize(void)
 {
 #if __linux__
   mHandle = nullptr;
-  if( snd_pcm_open(&mHandle, ALSA_DEVICE_NAME, SND_PCM_STREAM_PLAYBACK, 0) < 0 ){
+  int err;
+  if( (err = snd_pcm_open(&mHandle, ALSA_DEVICE_NAME, SND_PCM_STREAM_PLAYBACK, 0)) < 0 ){
+    std::cout << "AlsaPrimitive::failed to open:" << err << std::endl;
     mHandle = nullptr;
   }
 #endif
@@ -63,7 +66,7 @@ bool AlsaPrimitive::config(AudioFormat& format)
       default:
         break;
     }
-    snd_pcm_set_params(mHandle,
+    int err = snd_pcm_set_params(mHandle,
       alsaFormat,
       SND_PCM_ACCESS_RW_INTERLEAVED,
       format.getNumberOfChannels(),
@@ -71,9 +74,12 @@ bool AlsaPrimitive::config(AudioFormat& format)
       1,
       500000
     );
+    std::cout << "AlsaPrimitive::config as " << format.toString() << " (ret:" << err << ")" << std::endl;
   }
-#endif
   return ( mHandle != nullptr );
+#else
+  return true;
+#endif
 }
 
 
@@ -91,6 +97,10 @@ void AlsaPrimitive::write(IAudioBuffer& buf)
 #if __linux__
     if( mHandle ){
       snd_pcm_sframes_t frames = snd_pcm_writei( mHandle, rawBuffer.data(), rawBuffer.size() );
+      std::cout << "AlsaPrimitive::pcm_write() " << frames << " frames" << std::endl;
+      if( frames < 0) {
+        frames = snd_pcm_recover(mHandle, frames, 0);
+      }
     }
 #endif
   }
